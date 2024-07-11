@@ -1,0 +1,21 @@
+name: Event Detection
+language: python
+variables:
+  - name: input
+    inputType: InputTopic
+    description: This is the input topic
+    defaultValue: rssi-smooth
+    required: true
+  - name: output
+    inputType: OutputTopic
+    description: ''
+    defaultValue: proximity_alert
+    required: true
+  - name: rssi_threshold
+    inputType: FreeText
+    description: ''
+    defaultValue: -70
+    required: true
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: quix_function.py

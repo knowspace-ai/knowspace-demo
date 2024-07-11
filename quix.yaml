@@ -1,0 +1,162 @@
+# Quix Project Descriptor
+# This file describes the data pipeline and configuration of resources of a Quix Project.
+
+metadata:
+  version: 1.0
+
+# This section describes the Deployments of the data pipeline
+deployments:
+  - name: MQTT Source
+    application: source--mqtt
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to publish to.
+        required: true
+        value: mqtt-raw
+      - name: mqtt_topic
+        inputType: FreeText
+        description: The root for messages in MQTT, this can be anything
+        required: true
+        value: moko/emqx/quix/#
+      - name: mqtt_server
+        inputType: FreeText
+        description: The address of your MQTT server
+        required: true
+        value: k3ff60f0.ala.dedicated.aws.emqxcloud.com
+      - name: mqtt_port
+        inputType: FreeText
+        description: The port of your MQTT instance
+        required: true
+        value: 8883
+      - name: mqtt_username
+        inputType: FreeText
+        description: Your MQTT username
+        required: true
+        value: knowspace
+      - name: mqtt_version
+        inputType: FreeText
+        description: 'MQTT protocol version: 3.1, 3.1.1, 5'
+        required: true
+        value: 3.1.1
+      - name: mqtt_password
+        inputType: FreeText
+        description: ''
+        required: true
+        value: kn0w
+  - name: RSSI Smoothing
+    application: transformation--rssi-smoothing
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    state:
+      enabled: true
+      size: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        required: false
+        value: mqtt-raw
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        required: true
+        value: rssi-smooth
+      - name: ma_window_size
+        inputType: FreeText
+        description: hopping window size
+        required: true
+        value: 5000
+      - name: ma_step
+        inputType: FreeText
+        description: hopping window step
+        required: true
+        value: 500
+      - name: ma_grace
+        inputType: FreeText
+        description: hopping window grace
+        required: true
+        value: 100
+  - name: Event Detection
+    application: transformation--event-detection
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    state:
+      enabled: true
+      size: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: This is the input topic
+        required: true
+        value: rssi-smooth
+      - name: output
+        inputType: OutputTopic
+        description: ''
+        required: true
+        value: proximity-alert
+      - name: rssi_threshold
+        inputType: FreeText
+        description: ''
+        required: true
+        value: -76
+  - name: Airtable
+    application: destination--airtable
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        required: true
+        value: proximity-alert
+      - name: AIRTABLE_ACCESS_TOKEN
+        inputType: FreeText
+        description: ''
+        required: true
+        value: patOj7x43lIvXTzr7.2dff31392afb4b92c54ea7a24430703822c8fd8291bccbd5cd7f94bb6a3e3bdd
+      - name: AIRTABLE_BASE_ID
+        inputType: FreeText
+        description: ''
+        required: true
+        value: appaZQLFqJvjdguVd
+      - name: AIRTABLE_EVENTS_TABLE
+        inputType: FreeText
+        description: ''
+        required: true
+        value: tblnNTZ3Ar5538awi
+
+# This section describes the Topics of the data pipeline
+topics:
+  - name: mqtt-raw
+    configuration:
+      partitions: 1
+      replicationFactor: 2
+      retentionInMinutes: 1440
+      retentionInBytes: 52428800
+  - name: rssi-smooth
+    configuration:
+      partitions: 1
+      replicationFactor: 2
+      retentionInMinutes: 1440
+      retentionInBytes: 52428800
+  - name: proximity-alert
+  - name: rssi-average

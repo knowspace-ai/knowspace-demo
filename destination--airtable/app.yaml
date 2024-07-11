@@ -1,0 +1,26 @@
+name: Airtable
+language: Python
+variables:
+  - name: input
+    inputType: InputTopic
+    description: Name of the input topic to listen to.
+    defaultValue: proximity-alert
+    required: true
+  - name: AIRTABLE_ACCESS_TOKEN
+    inputType: FreeText
+    description: ''
+    defaultValue: patOj7x43lIvXTzr7.2dff31392afb4b92c54ea7a24430703822c8fd8291bccbd5cd7f94bb6a3e3bdd
+    required: true
+  - name: AIRTABLE_BASE_ID
+    inputType: FreeText
+    description: ''
+    defaultValue: appaZQLFqJvjdguVd
+    required: true
+  - name: AIRTABLE_EVENTS_TABLE
+    inputType: FreeText
+    description: ''
+    defaultValue: tblnNTZ3Ar5538awi
+    required: true
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py

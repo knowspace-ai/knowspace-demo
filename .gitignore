@@ -1,0 +1,12 @@
+.DS_Store
+
+**/.env
+
+**/*.json
+**/*.jsonl
+
+venv
+
+.notes.md
+
+__pycache__
